@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
+
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -14,7 +14,6 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
-
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -63,35 +62,43 @@ export default function SignIn(props) {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmit = (event) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+  
+    if (!validateInputs()) {
       return;
     }
+  
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const email = data.get('email');
+    const password = data.get('password');
+  
+    try {
+     
+      const response = await fetch(`/api/login?email=${email}&pass=${password}`);
+      const result = await response.json();
+  
+      
+      if (result.data === true) {
+        setMessage('Login successful!');
+      } else {
+        setMessage('Invalid email or password.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setMessage('An error occurred. Please try again.');
+    }
   };
 
   const validateInputs = () => {
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
     let isValid = true;
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');
       isValid = false;
@@ -100,7 +107,7 @@ export default function SignIn(props) {
       setEmailErrorMessage('');
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password || password.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage('Password must be at least 6 characters long.');
       isValid = false;
@@ -156,7 +163,6 @@ export default function SignIn(props) {
             <FormControl>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <FormLabel htmlFor="password">Password</FormLabel>
-                
               </Box>
               <TextField
                 error={passwordError}
@@ -177,33 +183,22 @@ export default function SignIn(props) {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-      
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
+            <Button type="submit" fullWidth variant="contained">
               Sign in
             </Button>
+            {message && <Typography color="error">{message}</Typography>}
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
               <span>
-                <Link
-                  href="/register"
-                  variant="body2"
-                  sx={{ alignSelf: 'center' }}
-                >
+                <Link href="/register" variant="body2" sx={{ alignSelf: 'center' }}>
                   Sign up
                 </Link>
               </span>
             </Typography>
-            <Link href="/navbar"
-             sx={{ alignSelf: 'center' }}
-             variant="body2">
-              Back To Home Page</Link>
+            <Link href="/navbar" sx={{ alignSelf: 'center' }} variant="body2">
+              Back To Home Page
+            </Link>
           </Box>
-         
         </Card>
       </SignInContainer>
     </>
