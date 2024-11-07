@@ -169,6 +169,11 @@ export default function SignIn(props) {
                 Back to login
               </Link>
             </Typography>
+            <Link href="/navbar"
+             variant="body2"
+             sx={{ alignSelf: 'center' }}>
+              Back To Home Page</Link>
+         
           </Box>
         </Card>
       </SignInContainer>

@@ -198,8 +198,12 @@ export default function SignIn(props) {
                 </Link>
               </span>
             </Typography>
+            <Link href="/navbar"
+             sx={{ alignSelf: 'center' }}
+             variant="body2">
+              Back To Home Page</Link>
           </Box>
-          
+         
         </Card>
       </SignInContainer>
     </>
