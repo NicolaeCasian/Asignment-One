@@ -15,7 +15,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 
-// Styled components using Material-UI's `styled`
+
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -47,9 +47,13 @@ export default function SignIn(props) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
   const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
+  
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('password').value;
     if (!validateInputs()) return;
 
     const data = new FormData(event.currentTarget);
@@ -58,7 +62,29 @@ export default function SignIn(props) {
       password: data.get('password'),
       confirmPassword: data.get('confirmPassword'),
     });
+
+    await runDBCallAsync(`http://localhost:3000/api/register?email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`);
   };
+
+  async function runDBCallAsync(url) {
+    try {
+      // Perform the GET request
+      const res = await fetch(url);
+      const data = await res.json();
+  
+      // Check the response from the server
+      if (data.data === "valid") {
+        console.log("Registration is valid!");
+        alert("Registration successful!");
+      } else {
+        console.log("Registration is not valid");
+        alert("Registration failed!");
+      }
+    } catch (error) {
+      console.error('Error during API call:', error);
+      alert("An error occurred. Please try again.");
+    }
+  }
 
   const validateInputs = () => {
     const email = document.getElementById('email').value;
