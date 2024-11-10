@@ -25,7 +25,7 @@ const settings = [
   { name: 'Logout', path: '/logout' },
 ];
 
-function ResponsiveAppBar() {
+export function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
