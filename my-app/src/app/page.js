@@ -5,7 +5,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import { Container, Button } from '@mui/material';
-import ResponsiveAppBar from './navbar/page'; // Adjust the import path as necessary
+import ResponsiveAppBar from './navbar/page'; 
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -40,7 +40,7 @@ export default function BasicTabs() {
   const [value, setValue] = useState(0);
   const [data, setData] = useState([]);
 
-  // Fetch data from the API once
+ 
   useEffect(() => {
     fetch('http://localhost:3000/api/getProducts')
       .then((res) => res.json())
@@ -52,25 +52,29 @@ export default function BasicTabs() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  //Filters doughnuts by type
+  const filterDoughnutsByType = (type) => {
+    return data.filter((item) => item.type === type);
+  };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      {/* Render the ResponsiveAppBar */}
+    <Box sx={{ width: '100%' , justifyContent:'center'}}>
+     
       <ResponsiveAppBar />
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-          <Tab label="Item One" {...a11yProps(0)} />
-          <Tab label="Item Two" {...a11yProps(1)} />
-          <Tab label="Item Three" {...a11yProps(2)} />
+          <Tab label="Jam Doughnuts" {...a11yProps(0)} />
+          <Tab label="Glazed Doughnuts" {...a11yProps(1)} />
+          <Tab label="Chocolate Doughnuts" {...a11yProps(2)} />
         </Tabs>
       </Box>
 
       <CustomTabPanel value={value} index={0}>
         <Container component="main" maxWidth="xs">
-          <div style={{ fontSize: '40px' }}>Doughnuts</div>
+          <div style={{ fontSize: '40px' }}>Jam Doughnuts</div>
           <div>
-            {data.map((item, i) => (
+            {filterDoughnutsByType('jam').map((item, i) => (
               <div style={{ padding: '20px' }} key={i}>
                 <br />
                 {item.pname} - {item.price}
@@ -83,11 +87,35 @@ export default function BasicTabs() {
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={1}>
-        Item Two
+      <Container component="main" maxWidth="xs">
+          <div style={{ fontSize: '40px' }}>Glazed Doughnuts</div>
+          <div>
+            {filterDoughnutsByType('glazed').map((item, i) => (
+              <div style={{ padding: '20px' }} key={i}>
+                <br />
+                {item.pname} - {item.price}
+                <br />
+                <Button variant="outlined">Add to cart</Button>
+              </div>
+            ))}
+          </div>
+        </Container>
       </CustomTabPanel>
 
       <CustomTabPanel value={value} index={2}>
-        Item Three
+      <Container component="main" maxWidth="xs">
+          <div style={{ fontSize: '40px' }}>Chocolate Doughnuts</div>
+          <div>
+            {filterDoughnutsByType('chocolate').map((item, i) => (
+              <div style={{ padding: '20px' }} key={i}>
+                <br />
+                {item.pname} - {item.price}
+                <br />
+                <Button variant="outlined">Add to cart</Button>
+              </div>
+            ))}
+          </div>
+        </Container>
       </CustomTabPanel>
     </Box>
   );

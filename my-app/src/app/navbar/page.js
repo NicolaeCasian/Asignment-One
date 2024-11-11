@@ -16,12 +16,12 @@ import MenuItem from '@mui/material/MenuItem';
 import DonutSmallIcon from '@mui/icons-material/DonutSmall';
 
 const pages = [
-  { name: 'Home', path: '/navbar' },
+  { name: 'Home', path: '/' },
   { name: 'Login', path: '/login' },
-  { name: 'Shopping Cart', path: '/cart' },
+  { name: 'Shopping Cart', path: '/shopping_cart' },
 ];
 const settings = [
-  { name: 'Orders', path: '/cart' },
+  { name: 'Orders', path: '/orders' },
   { name: 'Logout', path: '/logout' },
 ];
 
