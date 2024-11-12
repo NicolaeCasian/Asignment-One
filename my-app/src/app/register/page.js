@@ -195,7 +195,7 @@ export default function SignIn(props) {
                 Back to login
               </Link>
             </Typography>
-            <Link href="/navbar"
+            <Link href="/"
              variant="body2"
              sx={{ alignSelf: 'center' }}>
               Back To Home Page</Link>

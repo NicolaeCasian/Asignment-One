@@ -57,6 +57,25 @@ export default function BasicTabs() {
     return data.filter((item) => item.type === type);
   };
 
+  const handleAddtoCart = async (product) => {
+    if (!product) return;
+  
+    const { type, pname, price } = product;
+  
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/cart?type=${encodeURIComponent(type)}&pname=${encodeURIComponent(pname)}&price=${encodeURIComponent(price)}`
+      );
+      const result = await response.json();
+      if (response.ok) {
+        console.log(result.data);
+      } else {
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+    }
+  };
   return (
     <Box sx={{ width: '100%' , justifyContent:'center'}}>
      
@@ -79,7 +98,7 @@ export default function BasicTabs() {
                 <br />
                 {item.pname} - {item.price}
                 <br />
-                <Button variant="outlined">Add to cart</Button>
+                <Button variant="outlined" onClick={() => handleAddtoCart(item)}>Add to cart</Button>
               </div>
             ))}
           </div>
@@ -95,7 +114,7 @@ export default function BasicTabs() {
                 <br />
                 {item.pname} - {item.price}
                 <br />
-                <Button variant="outlined">Add to cart</Button>
+                <Button variant="outlined" onClick={() => handleAddtoCart(item)}>Add to cart</Button>
               </div>
             ))}
           </div>
@@ -111,7 +130,7 @@ export default function BasicTabs() {
                 <br />
                 {item.pname} - {item.price}
                 <br />
-                <Button variant="outlined">Add to cart</Button>
+                <Button variant="outlined"  onClick={() => handleAddtoCart(item)}>Add to cart</Button>
               </div>
             ))}
           </div>
