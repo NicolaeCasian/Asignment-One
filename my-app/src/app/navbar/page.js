@@ -1,6 +1,5 @@
-'use client';
-import * as React from 'react';
-import Link from 'next/link'; 
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -26,8 +25,9 @@ const settings = [
 ];
 
 export function ResponsiveAppBar() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [weather, setWeatherData] = useState(null);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -35,14 +35,24 @@ export function ResponsiveAppBar() {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
-
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  // Fetch the weather data
+  useEffect(() => {
+    fetch('http://localhost:3000/api/getWheater')
+      .then((res) => res.json())
+      .then((weatherData) => {
+        setWeatherData(weatherData); // Store weather data in state
+      })
+      .catch((error) => {
+        console.error("Error fetching weather data:", error);
+      });
+  }, []);
 
   return (
     <AppBar position="static">
@@ -134,10 +144,15 @@ export function ResponsiveAppBar() {
               </Link>
             ))}
           </Box>
+
+          <Typography sx={{ marginLeft: 2 }}>
+            {weather ? `Today's temperature: ${weather.temp}°C`:'' }
+          </Typography>
+
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu
