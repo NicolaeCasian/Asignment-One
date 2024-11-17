@@ -77,10 +77,11 @@ export default function BasicTabs() {
     }
   };
   return (
+    
     <Box sx={{ width: '100%' , justifyContent:'center'}}>
      
-      <ResponsiveAppBar />
-
+     
+     <ResponsiveAppBar />
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
           <Tab label="Jam Doughnuts" {...a11yProps(0)} />

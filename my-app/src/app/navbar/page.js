@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AppBar from '@mui/material/AppBar';
@@ -56,14 +57,14 @@ export function ResponsiveAppBar() {
 
   return (
     <AppBar position="static">
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" sx={{ padding: 0, margin: 0 }}>
         <Toolbar disableGutters>
           <DonutSmallIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
             component="a"
-            href="/navbar"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
