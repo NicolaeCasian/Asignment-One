@@ -9,7 +9,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { blue, purple } from '@mui/material/colors';
 import ResponsiveAppBar from '../navbar/page';
 
-// Create a theme
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -27,7 +27,7 @@ export default function ShoppingCart() {
   const [totalPrice, setTotalPrice] = useState(0); // State for total price
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/cart')
+    fetch('http://localhost:3000/api/cart/retrieve')
       .then((res) => res.json())
       .then((data) => {
         const items = Array.isArray(data) ? data : [];
@@ -92,7 +92,7 @@ export default function ShoppingCart() {
           ) : data.length > 0 ? (
             data.map((item) => (
               <div style={{ padding: '20px' }} key={item._id}>
-                {item.type} - {item.pname} - ${item.price}
+                {item.type} - {item.pname} - €{item.price}
                 <Button
                   variant="outlined"
                   color="secondary"
@@ -107,7 +107,7 @@ export default function ShoppingCart() {
             <div>No items in the cart</div>
           )}
           <div style={{ fontSize: '24px', marginTop: '20px' }}>
-            Total Price: ${ parseFloat(totalPrice).toFixed(2)}
+            Total Price: €{ parseFloat(totalPrice).toFixed(2)}
           </div>
           <Button variant="contained" color="primary" style={{ marginTop: '20px' }}>
             Check Out

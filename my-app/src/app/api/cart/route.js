@@ -3,59 +3,48 @@ import { MongoClient, ObjectId } from 'mongodb';
 const uri = 'mongodb+srv://nicolae:nico123@krispykreme.yky54.mongodb.net/?retryWrites=true&w=majority&appName=KrispyKreme';
 const client = new MongoClient(uri);
 
+
+
+//This Get Function works with the Add to Cart button by inserting the Item to the Database
 export async function GET(req) {
   try {
-    // Connect to MongoDB
+    
+    const { searchParams } = new URL(req.url); 
+    const pname = searchParams.get('pname');
+    const type = searchParams.get('type'); 
+    const price = searchParams.get('price'); 
+
+    // Connect to Database
     await client.connect();
-    const db = client.db('Krispy_Kreme_Ltd');
-    const collection = db.collection('cart');
+    console.log('Connected successfully to server');
 
-    // Retrieve all items from the collection
-    const findResult = await collection.find({}).toArray();
-    console.log("Found documents =>", findResult);
-
-    // Return the retrieved items as JSON
-    return new Response(JSON.stringify(findResult), { status: 200 });
-  } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: "Failed to retrieve items" }), { status: 500 });
-  } finally {
-    // Ensure the client is closed after the operation
-    await client.close();
-  }
-}
-
-export async function POST(req) {
-  try {
-    // Parse the request body
-    const { type, pname, price } = await req.json();
-
-    // Connect to MongoDB
-    await client.connect();
-    const db = client.db('Krispy_Kreme_Ltd');
-    const collection = db.collection('cart');
+    const db = client.db('Krispy_Kreme_Ltd'); 
+    const collection = db.collection('cart'); 
 
     // Insert the item into the collection
-    await collection.insertOne({ type, pname, price });
-    console.log("Order added successfully to cart");
+    const myobj = { type, pname, username: "sample@test.com", price };
+    const insertResult = await collection.insertOne(myobj);
+    console.log("Insert result:", insertResult);
 
-    // Return success response
-    return new Response(JSON.stringify({ message: "Order added successfully" }), { status: 200 });
+    
+    return new Response(JSON.stringify({ data: "Item Added to Cart" }), { status: 200 });
   } catch (error) {
     console.error("Error:", error);
-    return new Response(JSON.stringify({ error: "Failed to add item" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Item not Added to Cart" }), { status: 500 });
   } finally {
-    // Ensure the client is closed after the operation
+    
     await client.close();
   }
 }
 
+
+//This function Delete function works with the Delete button in the Shopping Cart Page
 export async function DELETE(req) {
   try {
     // Parse the request body to get the item ID
     const { id } = await req.json();
 
-    // Connect to MongoDB
+    // Connect to Database
     await client.connect();
     const db = client.db('Krispy_Kreme_Ltd');
     const collection = db.collection('cart');
@@ -73,7 +62,6 @@ export async function DELETE(req) {
     console.error("Error:", error);
     return new Response(JSON.stringify({ error: "Failed to delete item" }), { status: 500 });
   } finally {
-    // Ensure the client is closed after the operation
     await client.close();
   }
 }

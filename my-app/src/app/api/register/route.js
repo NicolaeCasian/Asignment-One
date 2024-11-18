@@ -12,7 +12,7 @@ export async function GET(req) {
 
     console.log("Received Registration Data:", { username: email, pass});
 
-    // Connect to MongoDB
+    // Connect to Database
     await client.connect();
     const db = client.db('Krispy_Kreme_Ltd');
     const collection = db.collection('Customers');
@@ -23,7 +23,7 @@ export async function GET(req) {
       return new Response(JSON.stringify({ data: "User already exists" }), { status: 409 });
     }
 
-    // Insert the new user
+    // Inserting new user
     await collection.insertOne({ username: email, pass });
     console.log("User registered successfully");
     return new Response(JSON.stringify({ data: "valid" }), { status: 200 });
