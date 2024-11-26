@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppBar from '@mui/material/AppBar';
@@ -16,22 +17,32 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import DonutSmallIcon from '@mui/icons-material/DonutSmall';
 
+// Define navigation pages with their names and paths
 const pages = [
   { name: 'Home', path: '/' },
   { name: 'Login', path: '/login' },
   { name: 'Shopping Cart', path: '/shopping_cart' },
 ];
 
-export function ResponsiveAppBar() {
+// The ResponsiveAppBar component
+const ResponsiveAppBar = () => {
+  // State for controlling navigation and user menus
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [weather, setWeatherData] = useState(null);
-  const [loadingWeather, setLoadingWeather] = useState(true);
-  const router = useRouter();
+  const [weather, setWeatherData] = useState(null); // Stores weather data
+  const [loadingWeather, setLoadingWeather] = useState(true); // Indicates weather data loading status
+  const router = useRouter(); // Handles navigation programmatically
 
+  // Opens the navigation menu
   const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+
+  // Opens the user menu
   const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+
+  // Closes the navigation menu
   const handleCloseNavMenu = () => setAnchorElNav(null);
+
+  // Closes the user menu
   const handleCloseUserMenu = () => setAnchorElUser(null);
 
   // Fetch weather data on mount
@@ -51,17 +62,16 @@ export function ResponsiveAppBar() {
 
     fetchWeather();
   }, []);
-  //Hanfles Logout function
+
+  // Handles the logout function by fetching the delete method from session api
   const handleLogout = async () => {
     try {
-      //Fetch the DELETE method from the session API
-      const response = await fetch('/api/sessions', { method: 'DELETE' }); 
+      const response = await fetch('/api/sessions', { method: 'DELETE' });
       if (response.ok) {
         console.log('Session deleted successfully');
-        router.push('/login'); // Redirect to login page
+        router.push('/login'); // Redirect to the login page
       } else {
-        const errorText = await response.text();
-        console.error('Failed to delete session:', errorText);
+        console.error('Failed to delete session');
         alert('Failed to log out. Please try again.');
       }
     } catch (error) {
@@ -74,8 +84,10 @@ export function ResponsiveAppBar() {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-         
+        
           <DonutSmallIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+
+          
           <Typography
             variant="h6"
             noWrap
@@ -131,7 +143,7 @@ export function ResponsiveAppBar() {
             </Menu>
           </Box>
 
-        
+         
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Link key={page.name} href={page.path} passHref>
@@ -154,7 +166,7 @@ export function ResponsiveAppBar() {
               : 'Weather unavailable'}
           </Typography>
 
-          {/* User Image and Settings */}
+          {/* User Avatar and Menu */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -186,6 +198,9 @@ export function ResponsiveAppBar() {
       </Container>
     </AppBar>
   );
-}
+};
 
-export default ResponsiveAppBar;
+
+export default function Page() {
+  return <ResponsiveAppBar />;
+}

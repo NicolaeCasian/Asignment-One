@@ -1,4 +1,4 @@
-import { decrypt } from './decrypt/route'; 
+import { decrypt } from '../../../../utils/decrypt/route.js'; 
 import { cookies } from 'next/headers';
 
 export async function GET() {

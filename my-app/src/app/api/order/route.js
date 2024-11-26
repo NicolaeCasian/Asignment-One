@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { cookies } from 'next/headers';
-import { decrypt } from '../sessions/decrypt/route';
+import { decrypt } from '../../../../utils/decrypt/route';
 import nodemailer from 'nodemailer';
 
 const uri = process.env.MONGO_URI;
@@ -80,7 +80,7 @@ export async function GET(req) {
             `;
     //Sends email text to the user who is logged in 
     await transporter.sendMail({
-      from: 'your-email@gmail.com',
+      from: process.env.GMAIL_USER,
       to: email,
       subject: 'Your Order Confirmation',
       text: emailText,

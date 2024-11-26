@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { encrypt } from '../sessions/encrypt/route';
+import { encrypt } from '../../../../utils/encrypt/route';
 import { NextResponse } from 'next/server';
 
 const uri = process.env.MONGO_URI; // Store your MongoDB URI in .env
