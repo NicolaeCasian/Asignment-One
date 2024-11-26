@@ -41,13 +41,12 @@ export default function SignIn() {
   const router = useRouter();
 
   useEffect(() => {
-    //Checks User Session
+    //Manager does not have session he just views the Dashboard IK not safe but whatever 
     const checkSession = async () => {
       try {
-        //Fetches the session API and makes sure to include credentials
         const res = await fetch('/api/sessions', { credentials: 'include' });
         const data = await res.json();
-        //If user has a session redirect to the homepage
+
         if (res.ok && data.loggedIn) {
           setSession(data.session);
           router.push('/');
@@ -59,24 +58,21 @@ export default function SignIn() {
 
     checkSession();
   }, [router]);
-
+//Fetches the manager api login
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      //fetches the login API and the email and password
-      const response = await fetch(`/api/login?email=${email}&pass=${password}`, {
+      const response = await fetch(`/api/manager?email=${email}&pass=${password}`, {
         method: 'GET',
         credentials: 'include',
       });
       const result = await response.json();
-      //If the credentials are correct it will display a message and redirect the user
-      //to the homepage
+
       if (result.success) {
-        setMessage(`Welcome back, ${result.session?.email || 'User'}`);
+        setMessage(`Welcome back, ${result.session?.email || 'Manager'}`);
         setSession(result.session);
-        router.push('/');
+        router.push('/dashboard');
       } else {
-        //displays invalid credentials if the input does not align with the database
         setMessage(result.message || 'Invalid login credentials.');
       }
     } catch (error) {
@@ -121,15 +117,9 @@ export default function SignIn() {
           </Typography>
         )}
         <Typography textAlign="center" marginTop={2}>
-          Not registered?{' '}
-          <Link href="/register" color="primary">
-            Go to Register
-          </Link>
-        </Typography>
-        <Typography textAlign="center" marginTop={2}>
-          Staff Member?{' '}
-          <Link href="/manager_login" color="primary">
-            Go to Staff Login
+          Not a Customer{' '}
+          <Link href="/login" color="primary">
+            Go to back to Customer Login
           </Link>
         </Typography>
       </Card>

@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import { Container } from '@mui/material';
+import { Container, Button } from '@mui/material';
 import ResponsiveAppBar from './navbar/page';
 import { useRouter } from 'next/navigation';
 
@@ -80,6 +80,35 @@ export default function BasicTabs() {
     setValue(newValue);
   };
 
+  const handleAddToCart = async (item) => {
+    try {
+      //convert the item details into query strings
+      const query = new URLSearchParams({
+        id: item._id,
+        pname: item.pname,
+        price: item.price,
+        type: item.type,
+      }).toString();
+      //Make a get request to the API to add to cart
+      const response = await fetch(`/api/cart?${query}`, {
+        method: 'GET', 
+        credentials: 'include',
+      });
+      
+      const result = await response.json();
+      //if succesfull show alert message
+      if (response.ok) {
+        alert('Item added to cart successfully!');
+      } else {
+        //if not show alert message to display that
+        alert(result.error || 'Failed to add item to cart.');
+      }
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+      alert('An error occurred. Please try again.');
+    }
+  };
+//Filters doughnuts by type
   const filterDoughnutsByType = (type) => {
     return data.filter((item) => item.type === type);
   };
@@ -99,13 +128,43 @@ export default function BasicTabs() {
         <Container>
           <Typography variant="h4">Jam Doughnuts</Typography>
           {filterDoughnutsByType('jam').map((item, i) => (
-            <Card key={i}>
-              <CardMedia component="img" alt="Jam Doughnut" image="/images/Jam1.png" />
-              <CardContent>
-                <Typography>{item.pname}</Typography>
-                <Typography>{item.price}</Typography>
-              </CardContent>
-            </Card>
+            <Card 
+            key={i} 
+            sx={{ 
+              width: 300,  
+              height: 400, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'space-between', 
+              mb: 2 
+            }}
+          >
+            <CardMedia
+              component="img"
+              alt="Jam Doughnut"
+              image="/images/Jam1.png"
+              sx={{
+                height: '150px', 
+                objectFit: 'cover', 
+              }}
+            />
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography variant="h6">{item.pname}</Typography>
+              <Typography>This is a delicious Jam Doughnut!</Typography>
+              <Typography variant="body1">€{item.price}</Typography>
+            </CardContent>
+            <CardContent>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={() => handleAddToCart(item)}
+              >
+                Add to Cart
+              </Button>
+            </CardContent>
+          </Card>
+          
           ))}
         </Container>
       </CustomTabPanel>
@@ -114,13 +173,42 @@ export default function BasicTabs() {
         <Container>
           <Typography variant="h4">Glazed Doughnuts</Typography>
           {filterDoughnutsByType('glazed').map((item, i) => (
-            <Card key={i}>
-              <CardMedia component="img" alt="Glazed Doughnut" image="/images/glazed.png" />
-              <CardContent>
-                <Typography>{item.pname}</Typography>
-                <Typography>{item.price}</Typography>
-              </CardContent>
-            </Card>
+          <Card 
+            key={i} 
+            sx={{ 
+            width: 300,  
+            height: 400, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'space-between', 
+              mb: 2 
+            }}
+          >
+          <CardMedia
+            component="img"
+            alt="Glazed Doughnut"
+            image="/images/glazed.png"
+           sx={{
+           height: '150px', 
+           objectFit: 'cover', 
+            }}
+           />
+          <CardContent sx={{ textAlign: 'center' }}>
+          <Typography variant="h6">{item.pname}</Typography>
+          <Typography>This is a delicious Glazed Doughnuts!</Typography>
+          <Typography variant="body1">€{item.price}</Typography>
+          </CardContent>
+          <CardContent>
+          <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={() => handleAddToCart(item)}
+          >
+          Add to Cart
+        </Button>
+  </CardContent>
+</Card>
           ))}
         </Container>
       </CustomTabPanel>
@@ -129,13 +217,42 @@ export default function BasicTabs() {
         <Container>
           <Typography variant="h4">Chocolate Doughnuts</Typography>
           {filterDoughnutsByType('chocolate').map((item, i) => (
-            <Card key={i}>
-              <CardMedia component="img" alt="Chocolate Doughnut" image="/images/chocolate.png" />
-              <CardContent>
-                <Typography>{item.pname}</Typography>
-                <Typography>{item.price}</Typography>
-              </CardContent>
-            </Card>
+             <Card 
+             key={i} 
+             sx={{ 
+               width: 300,  
+               height: 400,
+               display: 'flex', 
+               flexDirection: 'column', 
+               justifyContent: 'space-between', 
+               mb: 2 
+             }}
+           >
+             <CardMedia
+               component="img"
+               alt="Jam Doughnut"
+               image="/images/chocolate.png"
+               sx={{
+                 height: '150px', 
+                 objectFit: 'cover', 
+               }}
+             />
+             <CardContent sx={{ textAlign: 'center' }}>
+               <Typography variant="h6">{item.pname}</Typography>
+               <Typography>A delicious Chocolate doughnut!</Typography>
+               <Typography variant="body1">€{item.price}</Typography>
+             </CardContent>
+             <CardContent>
+               <Button
+                 variant="contained"
+                 color="primary"
+                 fullWidth
+                 onClick={() => handleAddToCart(item)}
+               >
+                 Add to Cart
+               </Button>
+             </CardContent>
+           </Card>
           ))}
         </Container>
       </CustomTabPanel>

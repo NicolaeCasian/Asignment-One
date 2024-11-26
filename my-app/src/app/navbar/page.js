@@ -51,10 +51,11 @@ export function ResponsiveAppBar() {
 
     fetchWeather();
   }, []);
-
+  //Hanfles Logout function
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/sessions', { method: 'DELETE' }); // Absolute path to session API
+      //Fetch the DELETE method from the session API
+      const response = await fetch('/api/sessions', { method: 'DELETE' }); 
       if (response.ok) {
         console.log('Session deleted successfully');
         router.push('/login'); // Redirect to login page
@@ -144,7 +145,7 @@ export function ResponsiveAppBar() {
             ))}
           </Box>
 
-          {/* Weather Display */}
+          {/* Weather API */}
           <Typography sx={{ marginLeft: 2 }}>
             {loadingWeather
               ? 'Loading weather...'
@@ -153,7 +154,7 @@ export function ResponsiveAppBar() {
               : 'Weather unavailable'}
           </Typography>
 
-          {/* User Avatar and Settings */}
+          {/* User Image and Settings */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

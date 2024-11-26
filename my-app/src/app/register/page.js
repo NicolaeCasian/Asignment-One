@@ -48,10 +48,10 @@ export default function SignIn(props) {
   const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
   const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
   
-
+//Handles the Register Submit
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    
     const email = document.getElementById('email').value;
     const pass = document.getElementById('password').value;
     if (!validateInputs()) return;
@@ -62,7 +62,7 @@ export default function SignIn(props) {
       password: data.get('password'),
       confirmPassword: data.get('confirmPassword'),
     });
-
+  
     await runDBCallAsync(`http://localhost:3000/api/register?email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`);
   };
 
@@ -92,7 +92,7 @@ export default function SignIn(props) {
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     let isValid = true;
-
+    
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');

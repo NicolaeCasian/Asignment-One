@@ -8,7 +8,7 @@ const client = new MongoClient(uri);
 //This Get Function works with the Add to Cart button by inserting the Item to the Database
 export async function GET(req) {
   try {
-    
+    //Search Parameters to get from Product
     const { searchParams } = new URL(req.url); 
     const pname = searchParams.get('pname');
     const type = searchParams.get('type'); 
@@ -26,10 +26,11 @@ export async function GET(req) {
     const insertResult = await collection.insertOne(myobj);
     console.log("Insert result:", insertResult);
 
-    
+    //Return Item Added to cart response and message
     return new Response(JSON.stringify({ data: "Item Added to Cart" }), { status: 200 });
   } catch (error) {
     console.error("Error:", error);
+    //Return Item not Added to cart response and message
     return new Response(JSON.stringify({ error: "Item not Added to Cart" }), { status: 500 });
   } finally {
     
@@ -41,26 +42,33 @@ export async function GET(req) {
 //This function Delete function works with the Delete button in the Shopping Cart Page
 export async function DELETE(req) {
   try {
-    // Parse the request body to get the item ID
-    const { id } = await req.json();
+    const { id, username } = await req.json();
 
-    // Connect to Database
     await client.connect();
     const db = client.db('Krispy_Kreme_Ltd');
     const collection = db.collection('cart');
-
-    // Delete the item with the specified ID
-    const result = await collection.deleteOne({ _id: new ObjectId(id) });
-    if (result.deletedCount === 1) {
-      console.log("Item deleted successfully");
-      return new Response(JSON.stringify({ message: "Item deleted successfully" }), { status: 200 });
+      //if there is a username aka session
+    if (username) {
+      // Clear all items for the user
+      const result = await collection.deleteMany({ username });
+      return new Response(
+        JSON.stringify({ message: `Deleted ${result.deletedCount} items for user: ${username}` }),
+        { status: 200 }
+      );
+    } else if (id) {
+      // Delete a single item by ID
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      if (result.deletedCount === 1) {
+        return new Response(JSON.stringify({ message: 'Item deleted successfully' }), { status: 200 });
+      } else {
+        return new Response(JSON.stringify({ error: 'Item not found' }), { status: 404 });
+      }
     } else {
-      console.log("Item not found");
-      return new Response(JSON.stringify({ error: "Item not found" }), { status: 404 });
+      return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 });
     }
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: "Failed to delete item" }), { status: 500 });
+    console.error('Error:', error);
+    return new Response(JSON.stringify({ error: 'Failed to delete items' }), { status: 500 });
   } finally {
     await client.close();
   }

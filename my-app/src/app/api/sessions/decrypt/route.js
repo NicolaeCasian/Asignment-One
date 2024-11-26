@@ -8,7 +8,7 @@ export async function decrypt(token) {
       console.error('No token provided for decryption.');
       return null;
     }
-
+    //Uses Algorhithm to decrypt the payload aka the session data
     const { payload } = await jwtVerify(token, secretKey, { algorithms: ['HS256'] });
     console.log('Decrypted session payload:', payload); // Debugging log
     return payload;
