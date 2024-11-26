@@ -1,6 +1,7 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -20,45 +21,59 @@ const pages = [
   { name: 'Login', path: '/login' },
   { name: 'Shopping Cart', path: '/shopping_cart' },
 ];
-const settings = [
-  { name: 'Orders', path: '/orders' },
-  { name: 'Logout', path: '/logout' },
-];
 
 export function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [weather, setWeatherData] = useState(null);
+  const [loadingWeather, setLoadingWeather] = useState(true);
+  const router = useRouter();
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
+  const handleCloseUserMenu = () => setAnchorElUser(null);
 
-  // Fetch the weather data
+  // Fetch weather data on mount
   useEffect(() => {
-    fetch('http://localhost:3000/api/getWheater')
-      .then((res) => res.json())
-      .then((weatherData) => {
-        setWeatherData(weatherData); // Store weather data in state
-      })
-      .catch((error) => {
-        console.error("Error fetching weather data:", error);
-      });
+    const fetchWeather = async () => {
+      try {
+        const res = await fetch('/api/getWheater');
+        if (!res.ok) throw new Error('Failed to fetch weather data');
+        const data = await res.json();
+        setWeatherData(data);
+      } catch (error) {
+        console.error('Error fetching weather data:', error.message);
+      } finally {
+        setLoadingWeather(false);
+      }
+    };
+
+    fetchWeather();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/sessions', { method: 'DELETE' }); // Absolute path to session API
+      if (response.ok) {
+        console.log('Session deleted successfully');
+        router.push('/login'); // Redirect to login page
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to delete session:', errorText);
+        alert('Failed to log out. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error.message);
+      alert('An error occurred during logout. Please try again.');
+    }
+  };
 
   return (
     <AppBar position="static">
-      <Container maxWidth="xl" sx={{ padding: 0, margin: 0 }}>
+      <Container maxWidth="xl">
         <Toolbar disableGutters>
+         
           <DonutSmallIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
@@ -78,10 +93,11 @@ export function ResponsiveAppBar() {
             Krispy Kreme
           </Typography>
 
+        
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label="menu"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
@@ -103,36 +119,18 @@ export function ResponsiveAppBar() {
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
                 <MenuItem key={page.name} onClick={handleCloseNavMenu}>
                   <Link href={page.path} passHref>
-                    <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
+                    <Typography textAlign="center">{page.name}</Typography>
                   </Link>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
-          <DonutSmallIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="/navbar"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            Krispy Kreme
-          </Typography>
+
+        
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Link key={page.name} href={page.path} passHref>
@@ -146,10 +144,16 @@ export function ResponsiveAppBar() {
             ))}
           </Box>
 
+          {/* Weather Display */}
           <Typography sx={{ marginLeft: 2 }}>
-            {weather ? `Today's temperature: ${weather.temp}°C`:'' }
+            {loadingWeather
+              ? 'Loading weather...'
+              : weather
+              ? `Today's temperature: ${weather.temp}°C`
+              : 'Weather unavailable'}
           </Typography>
 
+          {/* User Avatar and Settings */}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -172,13 +176,9 @@ export function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
-                  <Link href={setting.path} passHref>
-                    <Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography>
-                  </Link>
-                </MenuItem>
-              ))}
+              <MenuItem onClick={handleLogout}>
+                <Typography textAlign="center">Logout</Typography>
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>

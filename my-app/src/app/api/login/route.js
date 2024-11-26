@@ -1,48 +1,60 @@
 import { MongoClient } from 'mongodb';
+import { encrypt } from '../sessions/encrypt/route';
+import { NextResponse } from 'next/server';
 
-
-const uri = 'mongodb+srv://nicolae:nico123@krispykreme.yky54.mongodb.net/?retryWrites=true&w=majority&appName=KrispyKreme';
+const uri = process.env.MONGO_URI; // Store your MongoDB URI in .env
 const client = new MongoClient(uri);
 
 export async function GET(req) {
-  console.log("in the api page");
-
-  // Extract email and password 
   const { searchParams } = new URL(req.url);
   const email = searchParams.get('email');
   const pass = searchParams.get('pass');
 
-  console.log("Email:", email);
-  console.log("Password:", pass);
+  if (!email || !pass) {
+    return new Response(
+      JSON.stringify({ message: 'Email and password are required', success: false }),
+      { status: 400 }
+    );
+  }
 
   try {
-    // Connecting to MongoDB Atlas
     await client.connect();
-    console.log('Connected successfully to MongoDB Atlas');
+    const db = client.db('Krispy_Kreme_Ltd'); // Replace with your actual DB name
+    const collection = db.collection('Customers'); // Replace with your actual collection name
 
-    
-    const db = client.db('Krispy_Kreme_Ltd'); 
-    const collection = db.collection('Customers'); 
-
-    // Finds user
-    const findResult = await collection.find({ username: email }).toArray();
-    console.log('Found documents =>', findResult);
-
-    let valid = false;
-    if (findResult.length > 0 && findResult[0].pass === pass) {
-      valid = true;
-      console.log("login valid");
-    } else {
-      console.log("login invalid");
+    const user = await collection.findOne({ username: email });
+    if (!user || user.pass !== pass) {
+      return new Response(
+        JSON.stringify({ message: 'Invalid email or password', success: false }),
+        { status: 401 }
+      );
     }
 
-    // Return the validation result
-    return new Response(JSON.stringify({ data: valid }), { status: 200 });
+    const sessionData = { email: user.username, role: 'user' };
+    const token = await encrypt(sessionData);
+
+    const response = NextResponse.json({
+      message: 'Login successful',
+      success: true,
+      token,
+    });
+
+    response.cookies.set('session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      sameSite: 'lax', // Ensure the cookie is sent with cross-site requests
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+
+    return response;
   } catch (error) {
-    console.error("Error connecting to MongoDB Atlas:", error);
-    return new Response(JSON.stringify({ error: "Database connection error" }), { status: 500 });
+    console.error('Error during login:', error.message);
+    return new Response(
+      JSON.stringify({ message: 'Internal server error', success: false }),
+      { status: 500 }
+    );
   } finally {
-    // End
     await client.close();
   }
 }

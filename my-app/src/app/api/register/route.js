@@ -34,4 +34,6 @@ export async function GET(req) {
   } finally {
     await client.close();
   }
+
+  
 }

@@ -1,18 +1,17 @@
 'use client';
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
-
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Box,
+  Button,
+  CssBaseline,
+  FormControl,
+  FormLabel,
+  TextField,
+  Typography,
+  Stack,
+  Card as MuiCard,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -26,65 +25,59 @@ const Card = styled(MuiCard)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: {
     maxWidth: '450px',
   },
-  boxShadow:
-    'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
-  ...theme.applyStyles('dark', {
-    boxShadow:
-      'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
-  }),
 }));
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
-  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  minHeight: '100%',
+  height: '100vh',
   padding: theme.spacing(2),
-  [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(4),
-  },
-  '&::before': {
-    content: '""',
-    display: 'block',
-    position: 'absolute',
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
-    backgroundRepeat: 'no-repeat',
-    ...theme.applyStyles('dark', {
-      backgroundImage:
-        'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
-    }),
-  },
+  justifyContent: 'center',
 }));
 
-export default function SignIn(props) {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [message, setMessage] = React.useState('');
+export default function SignIn() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [session, setSession] = useState(null); // Manage session state
+  const router = useRouter();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-  
-    if (!validateInputs()) {
-      return;
-    }
-  
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
-  
+  // Check session on page load
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/sessions', { credentials: 'include' });
+        const data = await res.json();
+
+        if (res.ok && data.loggedIn) {
+          console.log('Session data:', data.session); // Debugging log
+          setSession(data.session); // Save the session in state
+          router.push('/'); // Redirect to the home page if logged in
+        } else {
+          console.log('No valid session found:', data.error);
+        }
+      } catch (error) {
+        console.error('Error validating session:', error);
+      }
+    };
+
+    checkSession();
+  }, [router]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-     
-      const response = await fetch(`/api/login?email=${email}&pass=${password}`);
+      const response = await fetch(`/api/login?email=${email}&pass=${password}`, {
+        method: 'GET',
+        credentials: 'include', // Ensures cookies are sent
+      });
       const result = await response.json();
-  
-      
-      if (result.data === true) {
-        setMessage('Login successful!');
+
+      if (result.success) {
+        console.log('Login successful. Session token set.');
+        setMessage(`Welcome back, ${result.session?.email || 'User'}`);
+        setSession(result.session); // Save session data after login
+        router.push('/'); // Redirect to home page after successful login
       } else {
-        setMessage('Invalid email or password.');
+        setMessage(result.message || 'Invalid login credentials.');
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -92,115 +85,38 @@ export default function SignIn(props) {
     }
   };
 
-  const validateInputs = () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    let isValid = true;
-
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
-
-    if (!password || password.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
-
-    return isValid;
-  };
-
   return (
-    <>
-      <CssBaseline enableColorScheme />
-      <SignInContainer direction="column" justifyContent="space-between">
-        <Card variant="outlined">
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-          >
-            Sign in
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              gap: 2,
-            }}
-          >
-            <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
-              <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
-                id="email"
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                autoComplete="email"
-                autoFocus
-                required
-                fullWidth
-                variant="outlined"
-                color={emailError ? 'error' : 'primary'}
-                sx={{ ariaLabel: 'email' }}
-              />
-            </FormControl>
-            <FormControl>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <FormLabel htmlFor="password">Password</FormLabel>
-              </Box>
-              <TextField
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                name="password"
-                placeholder="••••••"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                autoFocus
-                required
-                fullWidth
-                variant="outlined"
-                color={passwordError ? 'error' : 'primary'}
-              />
-            </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+    <SignInContainer>
+      <CssBaseline />
+      <Card>
+        <Typography component="h1" variant="h4" textAlign="center">
+          Sign In
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          <FormControl fullWidth>
+            <FormLabel>Email</FormLabel>
+            <TextField
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
-            <Button type="submit" fullWidth variant="contained">
-              Sign in
-            </Button>
-            {message && <Typography color="error">{message}</Typography>}
-            <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
-              <span>
-                <Link href="/register" variant="body2" sx={{ alignSelf: 'center' }}>
-                  Sign up
-                </Link>
-              </span>
-            </Typography>
-            <Link href="/navbar" sx={{ alignSelf: 'center' }} variant="body2">
-              Back To Home Page
-            </Link>
-          </Box>
-        </Card>
-      </SignInContainer>
-    </>
+          </FormControl>
+          <FormControl fullWidth>
+            <FormLabel>Password</FormLabel>
+            <TextField
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </FormControl>
+          <Button type="submit" variant="contained" fullWidth>
+            Sign In
+          </Button>
+        </Box>
+        {message && <Typography color="error">{message}</Typography>}
+      </Card>
+    </SignInContainer>
   );
 }
