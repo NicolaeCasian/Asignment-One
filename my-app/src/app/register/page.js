@@ -15,7 +15,6 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 
-
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -47,32 +46,30 @@ export default function SignIn(props) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
   const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
-  
-//Handles the Register Submit
+
+  // Handles the Register Submit
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     const email = document.getElementById('email').value;
     const pass = document.getElementById('password').value;
+
     if (!validateInputs()) return;
 
-    const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-      confirmPassword: data.get('confirmPassword'),
+      email: email,
+      password: pass,
     });
-  
-    await runDBCallAsync(`http://localhost:3000/api/register?email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`);
+
+    await runDBCallAsync(`https://krispykremeltd-ae46l1x2d-nicolaecasians-projects.vercel.app/api/register?email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`);
   };
 
   async function runDBCallAsync(url) {
     try {
-      // Perform the GET request
+      console.log("API URL:", url); // Log the API URL
       const res = await fetch(url);
       const data = await res.json();
-  
-      // Check the response from the server
+
       if (data.data === "valid") {
         console.log("Registration is valid!");
         alert("Registration successful!");
@@ -92,7 +89,7 @@ export default function SignIn(props) {
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     let isValid = true;
-    
+
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');
@@ -187,7 +184,7 @@ export default function SignIn(props) {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
+            <Button type="submit" fullWidth variant="contained">
               Sign Up
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
@@ -195,11 +192,9 @@ export default function SignIn(props) {
                 Back to login
               </Link>
             </Typography>
-            <Link href="/"
-             variant="body2"
-             sx={{ alignSelf: 'center' }}>
-              Back To Home Page</Link>
-         
+            <Link href="/" variant="body2" sx={{ alignSelf: 'center' }}>
+              Back To Home Page
+            </Link>
           </Box>
         </Card>
       </SignInContainer>
