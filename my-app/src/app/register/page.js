@@ -61,7 +61,7 @@ export default function SignIn(props) {
       password: pass,
     });
 
-    await runDBCallAsync(`/api/register?email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`);
+    await runDBCallAsync(`http://localhost:3000/api/register?email=${encodeURIComponent(email)}&pass=${encodeURIComponent(pass)}`);
   };
 
   async function runDBCallAsync(url) {
