@@ -19,8 +19,8 @@ export async function GET(req) {
 
   try {
     await client.connect();
-    const db = client.db('Krispy_Kreme_Ltd'); // Replace with your actual DB name
-    const collection = db.collection('Customers'); // Replace with your actual collection name
+    const db = client.db('Krispy_Kreme_Ltd'); 
+    const collection = db.collection('Customers'); 
 
     const user = await collection.findOne({ username: email });
     //If user and pass invalid show message
