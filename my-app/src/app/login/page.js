@@ -99,6 +99,7 @@ export default function SignIn() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              inputProps={{ maxLength: 20 }} 
               required
             />
           </FormControl>
@@ -108,6 +109,7 @@ export default function SignIn() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              inputProps={{ maxLength: 20 }} 
               required
             />
           </FormControl>

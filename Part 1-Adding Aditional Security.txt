@@ -1,0 +1,11 @@
+Part 1-Adding Aditional Security
+1. Adding byscrpt to the password field which is stored in the database
+2. Limit the number of characters in a field on the client side
+3. Check if the field matches
+4. User should never be ableto enter NULL/Blank values
+5. 
+
+Part 2-Application Testing
+Create 10 different tests for my application 
+
+1.     

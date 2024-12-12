@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
+import validator from 'email-validator';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -90,7 +91,7 @@ export default function SignIn(props) {
 
     let isValid = true;
 
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+    if (!email || !validator.validate(email)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');
       isValid = false;
@@ -151,6 +152,7 @@ export default function SignIn(props) {
                 required
                 fullWidth
                 variant="outlined"
+                inputProps={{ maxLength: 20 }} 
               />
             </FormControl>
             <FormControl>
@@ -165,6 +167,7 @@ export default function SignIn(props) {
                 required
                 fullWidth
                 variant="outlined"
+                inputProps={{ maxLength: 20 }} 
               />
             </FormControl>
             <FormControl>
@@ -178,6 +181,7 @@ export default function SignIn(props) {
                 required
                 fullWidth
                 variant="outlined"
+                inputProps={{ maxLength: 20 }} 
               />
             </FormControl>
             <FormControlLabel

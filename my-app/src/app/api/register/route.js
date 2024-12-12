@@ -4,36 +4,34 @@ const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
 
 export async function GET(req) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const email = searchParams.get('email');
-    const pass = searchParams.get('pass');
-    
+  const { searchParams } = new URL(req.url);
+  const email = searchParams.get('email');
+  const pass = searchParams.get('pass');
+  
+  console.log("Received Registration Data:", { username: email, pass });
 
-    console.log("Received Registration Data:", { username: email, pass});
+  const bcrypt = require('bcrypt');
 
-    // Connect to Database
-    await client.connect();
-    const db = client.db('Krispy_Kreme_Ltd');
-    const collection = db.collection('Customers');
+  const saltRounds = 10;
 
-    // Check if the user already exists
-    const existingUser = await collection.findOne({username: email });
-    if (existingUser) {
-      return new Response(JSON.stringify({ data: "User already exists" }), { status: 409 });
-    }
+   const hash = bcrypt.hashSync(pass, saltRounds);
 
-    // Inserting new user
-    await collection.insertOne({ username: email, pass });
-    console.log("User registered successfully");
-    return new Response(JSON.stringify({ data: "valid" }), { status: 200 });
-    
-  } catch (error) {
-    console.error("Error during registration:", error);
-    return new Response(JSON.stringify({ error: "Database error" }), { status: 500 });
-  } finally {
-    await client.close();
+  // Connect to Database
+  await client.connect();
+  const db = client.db('Krispy_Kreme_Ltd');
+  const collection = db.collection('Customers');
+
+  // Check if the user already exists
+  const existingUser = await collection.findOne({ username: email });
+  if (existingUser) {
+    return new Response(JSON.stringify({ data: "User already exists" }), { status: 409 });
   }
 
-  
+  // Inserting new user
+  await collection.insertOne({ username: email, pass : hash });
+  console.log("User registered successfully");
+
+  await client.close();
+
+  return new Response(JSON.stringify({ data: "valid" }), { status: 200 });
 }
